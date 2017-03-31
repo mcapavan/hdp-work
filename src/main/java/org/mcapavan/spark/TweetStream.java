@@ -19,6 +19,9 @@ import twitter4j.Status;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
 /**
  * Displays the most positive hash tags by joining the streaming Twitter data with a static RDD of
  * the AFINN word list (http://neuro.imm.dtu.dk/wiki/AFINN)
@@ -30,6 +33,10 @@ import java.util.List;
 public class TweetStream {
     public static void main(String[] args) {
 
+
+        Logger.getLogger("org").setLevel(Level.OFF);
+        Logger.getLogger("akka").setLevel(Level.OFF);
+
         // Set the system properties so that Twitter4j library used by Twitter stream
         // can use them to generate OAuth credentials
 
@@ -39,7 +46,7 @@ public class TweetStream {
         final String accessTokenSecret = "39Ncxsgn6d9dov7ZN1kYKx1eMQe2zi3autgZyF7rR4q9h";
 
         SparkConf conf = new SparkConf().setMaster("local[4]").setAppName("SparkTwitterStreaming");
-        JavaStreamingContext jssc = new JavaStreamingContext(conf, new Duration(60000));
+        JavaStreamingContext jssc = new JavaStreamingContext(conf, new Duration(20000));
 
         System.setProperty("twitter4j.oauth.consumerKey", consumerKey);
         System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret);
@@ -51,6 +58,9 @@ public class TweetStream {
 
         JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(jssc, filters);
 
+        stream.repartition(1).dstream()
+                .saveAsTextFiles("../data/raw/twitter/tweet","txt");
+
         // Without filter: Output text of all tweets
         JavaDStream<String> statuses = stream.map(
                 new Function<Status, String>() {
@@ -59,7 +69,8 @@ public class TweetStream {
         );
 
         statuses.print();
-        statuses.dstream().saveAsTextFiles("hdfs://sandbox.hortonworks.com:8020/data/raw/twitter","txt");
+        statuses.repartition(1).dstream()
+                .saveAsTextFiles("/data/processed/twitter/tweet","txt");
 
         JavaDStream<String> words = stream.flatMap(new FlatMapFunction<Status, String>() {
             @Override
@@ -103,9 +114,9 @@ public class TweetStream {
                     public Integer call(Integer a, Integer b) {
                         return a + b;
                     }
-                }, new Duration(120000));
+                }, new Duration(60000));
 
-        // Determine the hash tags with the highest sentiment values by joining the streaming RDD
+        // Determine the hash tags with the highest happiest10 values by joining the streaming RDD
         // with the static RDD inside the transform() method and then multiplying
         // the frequency of the hash tag by its sentiment value
         JavaPairDStream<String, Tuple2<Double, Integer>> joinedTuples =
@@ -148,13 +159,17 @@ public class TweetStream {
                 }
         );
 
+        happiest10.repartition(1).dstream()
+                .saveAsTextFiles("/data/processed/tweet-sentiment/happiest10","txt");
+
+
         // Print hash tags with the most positive sentiment values
         happiest10.foreachRDD(new VoidFunction<JavaPairRDD<Double, String>>() {
             @Override
             public void call(JavaPairRDD<Double, String> happinessTopicPairs) {
                 List<Tuple2<Double, String>> topList = happinessTopicPairs.take(10);
                 System.out.println(
-                        String.format("\nHappiest topics in last 10 seconds (%s total):",
+                        String.format("\nHappiest topics in last 60 seconds (%s total):",
                                 happinessTopicPairs.count()));
                 for (Tuple2<Double, String> pair : topList) {
                     System.out.println(
