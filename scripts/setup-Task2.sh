@@ -48,12 +48,8 @@ hive  -e "select count(*) from employees;"
 echo "*** Hive salaries record count: "
 hive -e "select count(*) from salaries;"
 
-echo "*** Deleting the downloaded DB files ***"
-
-echo "rm -rf ../employees_db"
-echo "rm -f ../employees_db-full-1.0.6.tar"
-
-rm -rf ../employees_db
-rm -f ../employees_db-full-1.0.6.tar
+echo "*** Update sample_twitter_data.txt into HDFS"
+hdfs dfs -mkdir -p /data/raw/sample_twitter_data
+hdfs dfs -put ../../data/sample_twitter_data.txt /data/raw/sample_twitter_data
 
 echo "******* Task 2 – Data Pipelines in Hive setup has been completed *******"
