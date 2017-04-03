@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
 
-hive <<EOD
 -- ---------------------------------------------------------------------------
 !echo "*** Create and set database ***";
 -- ---------------------------------------------------------------------------
@@ -44,4 +42,3 @@ LOCATION '/data/raw/sample_twitter_data';
 -- ---------------------------------------------------------------------------
 
 SELECT tweetmessage from twitter.tweets_hdp where user.screenname='Aimee_Cottle';
-EOD
