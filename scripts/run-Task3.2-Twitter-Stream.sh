@@ -7,8 +7,9 @@ mvn clean package
 
 echo "*** setup input and output directories in HDFS ***"
 
-hdfs dfs -rm -r /data/processed /data/raw/twitter
-hdfs dfs -mkidr -p src/data
+hdfs dfs -rm -r /data/processed /data/raw/twitter src/data
+hdfs dfs -mkdir -p /data/raw/twitter
+hdfs dfs -mkdir -p src/data
 hdfs dfs -put data/AFINN-111.txt src/data
 
 echo "*** Running Spark job to stream live tweets, analyze and store ***"
