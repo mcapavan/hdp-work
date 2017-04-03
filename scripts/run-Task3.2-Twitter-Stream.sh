@@ -1,20 +1,28 @@
 #!/usr/bin/env bash
 
-echo "*** Cleaning previous twitter data from HDFS ***"
-echo "hdfs dfs -rm -r /data/processed /data/raw/twitter"
+echo "***** Starting Twitter Streaming program *****"
+
+cd ../
+mvn clean package
+
+echo "*** setup input and output directories in HDFS ***"
 
 hdfs dfs -rm -r /data/processed /data/raw/twitter
+hdfs dfs -mkidr -p src/data
+hdfs dfs -put data/AFINN-111.txt src/data
 
 echo "*** Running Spark job to stream live tweets, analyze and store ***"
 echo "
 spark-submit \
   --class org.mcapavan.spark.TweetStream \
   --master local[4] \
-  /root/work/spark-submit-job/twitter-streaming-1.0-SNAPSHOT.jar
+  target/twitter-streaming-1.0-SNAPSHOT.jar
 "
 
 # Run application locally
 spark-submit \
   --class org.mcapavan.spark.TweetStream \
   --master local[4] \
-  /root/work/spark-submit-job/twitter-streaming-1.0-SNAPSHOT.jar
+  target/twitter-streaming-1.0-SNAPSHOT.jar
+
+echo "***** Twitter Streaming program is completed *****"
