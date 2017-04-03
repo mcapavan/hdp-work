@@ -1,0 +1,10 @@
+﻿%pyspark
+from pyspark.sql import functions as f
+df = sqlContext.sql("select * from salaries")
+df_sal = df.select(df.emp_no, df.salary, df.from_date, f.date_sub(df.to_date , 1).alias("to_date"))
+df_sal.write.format("orc").saveAsTable("salaries_new")
+
+df_emp = sqlContext.sql("select t1.emp_no, t1.birth_date, t1.first_name, t1.last_name, t1.gender, t2.hire_date_new as hire_date from employees t1 join (select emp_no, min(from_date) as hire_date_new from salaries_new group by emp_no) t2 on t1.emp_no = t2.emp_no")
+df_emp.write.format("orc").saveAsTable("employees_new")
+
+sqlContext.sql("select E.emp_no, first_name, last_name, hire_date, S.from_date, S.to_date from employees_new E join (select * from salaries_new where from_date like '1985-05-%' and datediff(to_date, from_date) < 15) S on E.emp_no = S.emp_no").show()

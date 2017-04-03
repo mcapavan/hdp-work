@@ -15,4 +15,5 @@ hdfs dfs -put json-serde/target/json-serde-1.3.8-SNAPSHOT-jar-with-dependencies.
 hdfs dfs -chmod -R 755 /lib
 
 echo "*** upload the sample_twitter_data.txt file to HDFS ***"
-hdfs dfs -put ../data/sample_twitter_data.txt /data/raw/sample_twitter_data
+hdfs dfs -mkdir -p /data/raw/sample_twitter_data
+hdfs dfs -put ../../data/sample_twitter_data.txt /data/raw/sample_twitter_data

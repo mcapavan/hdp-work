@@ -1,0 +1,24 @@
+﻿%pyspark
+from pyspark.sql import functions as f
+
+# cleansing to_date by one day
+df_sal = sqlContext.sql("select * from salaries")
+df_sal_new = df_sal.select(df_sal.emp_no, df_sal.salary, df_sal.from_date, f.date_sub(df_sal.to_date , 1).alias("to_date"))
+
+# cleansing hire_date
+df_sal_tmp = df_sal_new.groupBy('emp_no').agg(f.min('from_date').alias('hire_date'))
+df_emp = sqlContext.sql("select * from employees")
+df_emp_new = df_emp.join(df_sal_tmp, df_emp.emp_no == df_sal_tmp.emp_no, "inner")\
+    .select(df_emp.emp_no,df_emp.birth_date, df_emp.first_name, df_emp.last_name, df_emp.gender, df_sal_tmp.hire_date)
+
+# determine employee lasted less than two weeks in the job in May 1985
+df_sal_198505 = df_sal_new.filter(df_sal_new["from_date"].rlike("1985-05-*"))
+df_emp_198505 = df_sal_198505.filter(f.datediff(df_sal_198505.to_date, df_sal_198505.from_date) < 15 )
+
+df_emp.join(df_emp_198505, df_emp.emp_no == df_emp_198505.emp_no, "inner")\
+    .select(df_emp.emp_no, df_emp.first_name, df_emp.last_name, df_emp.hire_date, df_emp_198505.from_date, df_emp_198505.to_date).show()
+
+# save cleansing data into Hive with ORC format
+df_sal_new.write.format("orc").saveAsTable("salaries_new")
+df_emp_new.write.format("orc").saveAsTable("employees_new")
+

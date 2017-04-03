@@ -12,6 +12,9 @@ sed -i 's/storage_engine/default_storage_engine/g' employees.sql
 sed -i 's/storage_engine/default_storage_engine/g' test_employees_md5.sql
 sed -i 's/storage_engine/default_storage_engine/g' test_employees_sha.sql
 
+echo "*** Delete MySQL employees DB"
+mysql --user=root --password=hadoop -e "drop database if exists employees"
+
 echo "*** Import the Employees DB to Hive's MySQL instance ***"
 mysql --user=root --password=hadoop -t < employees.sql
 mysql --user=root --password=hadoop -t < test_employees_md5.sql
@@ -47,9 +50,5 @@ echo "*** Hive employees record count: "
 hive  -e "select count(*) from employees;"
 echo "*** Hive salaries record count: "
 hive -e "select count(*) from salaries;"
-
-echo "*** Update sample_twitter_data.txt into HDFS"
-hdfs dfs -mkdir -p /data/raw/sample_twitter_data
-hdfs dfs -put ../../data/sample_twitter_data.txt /data/raw/sample_twitter_data
 
 echo "******* Task 2 – Data Pipelines in Hive setup has been completed *******"
