@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+
+
+AWS Details:
+
+ec2-52-56-219-167.eu-west-2.compute.amazonaws.com
+ 52.56.219.167
+
+
+chmod 600 hdp-exercise.pem
+
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-219-167.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com
+
+241 - Master
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-215-217.eu-west-2.compute.amazonaws.com
+203 - Zeppelin
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-221-70.eu-west-2.compute.amazonaws.com
+130 -
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-188-190.eu-west-2.compute.amazonaws.com
+
+
+ambari:
+ec2-52-56-215-217.eu-west-2.compute.amazonaws.com:8080
+ec2-52-56-221-70.eu-west-2.compute.amazonaws.com:9995
+
+# install iptables and ntpd
+sudo yum install iptables-services
+sudo systemctl start iptables
+sudo service iptables save
+sudo yum -y install ntp
+sudo systemctl start ntpd
+
+sudo chkconfig ntpd on
+sudo chkconfig iptables off
+sudo systemctl stop iptables
+sudo service ntpd start
+
+cd ~/aws-key/
+scp -i hdp-exercise.pem hdp-exercise.pem ec2-user@ec2-52-56-219-167.eu-west-2.compute.amazonaws.com:
+
+on node:
+mv hdp-exercise.pem .ssh/id_rsa
+
+
+Master:
+ec2-user@ec2-52-56-219-167.eu-west-2.compute.amazonaws.com
+52.56.219.167
+ip-172-31-26-241.eu-west-2.compute.internal
+172.31.26.241
+
+
+Data-nodes:
+ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.com
+52.56.220.174
+ip-172-31-31-203.eu-west-2.compute.internal
+172.31.31.203
+
+Data-node2:
+ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com
+52.56.222.243
+ip-172-31-24-130.eu-west-2.compute.internal
+172.31.24.130
+
+scp -i hdp-exercise.pem hdp-exercise.pem ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.com:
+scp -i hdp-exercise.pem hdp-exercise.pem ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com:
+
+
+sudo -i
+wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.4.2.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
+yum repolist
+yum install ambari-server
+ambari-server setup
+ambari-server start
+
+hive password: hive / hadoop
+
+Issues:
+BUG-41308 :
+During cluster install, DataNode fails to install with the following error:
+
+resource_management.core.exceptions.
+Fail: Execution of '/usr/bin/yum -d 0 -e 0 -y install snappy-devel' returned 1.
+Error: Package: snappy-devel-1.0.5-1.el6.x86_64 (HDP-UTILS-1.1.0.20)
+           Requires: snappy(x86-64) = 1.0.5-1.el6
+           Installed: snappy-1.1.0-3.el7.x86_64 (@anaconda/7.1)
+               snappy(x86-64) = 1.1.0-3.el7
+           Available: snappy-1.0.5-1.el6.x86_64 (HDP-UTILS-1.1.0.20)
+               snappy(x86-64) = 1.0.5-1.el6
+Hadoop requires the snappy-devel package that is a lower version that what is on the machine already. Run the following on the host and retry.
+
+yum remove snappy
+yum install snappy-devel
+
+#references:
+#https://hortonworks.com/blog/deploying-hadoop-cluster-amazon-ec2-hortonworks/
+# https://community.hortonworks.com/questions/18428/amazon-aws-ec2-ambari-install-sudo-chkconfig-ntpd.html
+#https://dzone.com/articles/how-set-multi-node-hadoop
+# https://docs.hortonworks.com/HDPDocuments/Ambari-2.1.0.0/bk_releasenotes_ambari_2.1.0.0/content/ambari_relnotes-2.1.0.0-known-issues.html
+# http://doc.mapr.com/display/MapR/Planning+the+Cluster
+# https://dataworkssummit.com/munich-2017/
+
+zeppelin has failed to start - mkdir: canno t create directory /var/run/zeppelin: Permission denied
+https://community.hortonworks.com/questions/44451/zeppelin-service-not-starting-via-hdp-24-ambari.html
+
+mkdir -p /var/run/zeppelin-notebook
+chown -R zeppelin:zeppelin /var/run/zeppelin-notebook
+chmod 777 /var/run
+
+
+Install Java JDK:
+https://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/#
+
+cd /opt/
+wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.tar.gz"
+tar xzf jdk-8u121-linux-x64.tar.gz
+cd /opt/jdk1.8.0_121/
+alternatives --install /usr/bin/java java /opt/jdk1.8.0_121/bin/java 2
+alternatives --config java
+
+alternatives --install /usr/bin/jar jar /opt/jdk1.8.0_121/bin/jar 2
+alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_121/bin/javac 2
+alternatives --set jar /opt/jdk1.8.0_121/bin/jar
+alternatives --set javac /opt/jdk1.8.0_121/bin/javac
+
+export JAVA_HOME=/opt/jdk1.8.0_121
+export JRE_HOME=/opt/jdk1.8.0_121/jre
+export PATH=$PATH:/opt/jdk1.8.0_121/bin:/opt/jdk1.8.0_121/jre/bin
+
+Install bzip2
+yum install bzip2
+
+GRANT ALL PRIVILEGES ON *.* TO 'hive'@'%' IDENTIFIED BY 'hadoop' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+UPDATE user SET Password=PASSWORD('hadoop') WHERE User='root';
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'hadoop';
+
+
+2) Access denied for user ‘root’@’%’ to database ‘flightinfo’
+
+Ans: MySQL access is typically limited to localhost by default.
+In a multi-node cluster, you need to open up that permission for the nodes that will be connecting to the MySQL Server.
+You can either do this per server basis (for all data nodes) or for a non-prod environment,
+you can just open up the permission for root@%.
+See this article for detailed instructions - https://rtcamp.com/tutorials/mysql/remote-access/
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'hadoop' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+hadoop.proxyuser.admin.groups=*
+hadoop.proxyuser.admin.hosts=*
+
+dfs.permissions.enabled  --> set to false
+
+
+
+<property>
+  <name>dfs.permissions</name>
+  <value>false</value>
+</property>

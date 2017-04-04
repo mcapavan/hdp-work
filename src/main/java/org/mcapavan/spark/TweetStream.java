@@ -59,7 +59,7 @@ public class TweetStream {
         JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(jssc, filters);
 
         stream.repartition(1).dstream()
-                .saveAsTextFiles("../data/raw/twitter/tweet","txt");
+                .saveAsTextFiles("/data/raw/twitter/tweet","txt");
 
         // Without filter: Output text of all tweets
         JavaDStream<String> statuses = stream.map(
