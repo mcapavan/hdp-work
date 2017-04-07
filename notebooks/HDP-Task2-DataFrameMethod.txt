@@ -22,3 +22,9 @@ df_emp.join(df_emp_198505, df_emp.emp_no == df_emp_198505.emp_no, "inner")\
 df_sal_new.write.format("orc").saveAsTable("salaries_new")
 df_emp_new.write.format("orc").saveAsTable("employees_new")
 
+
++------+----------+---------+----------+----------+----------+
+|emp_no|first_name|last_name| hire_date| from_date|   to_date|
++------+----------+---------+----------+----------+----------+
+|296678|   Boutros|  McClurg|1985-05-11|1985-05-11|1985-05-22|
++------+----------+---------+----------+----------+----------+

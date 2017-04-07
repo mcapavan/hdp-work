@@ -15,16 +15,17 @@ ssh -i hdp-exercise.pem ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.c
 ssh -i hdp-exercise.pem ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com
 
 241 - Master
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-215-217.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-205-130.eu-west-2.compute.amazonaws.com
 203 - Zeppelin
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-221-70.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-247-251.eu-west-2.compute.amazonaws.com
 130 -
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-188-190.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-199-154.eu-west-2.compute.amazonaws.com
+
 
 
 ambari:
-ec2-52-56-215-217.eu-west-2.compute.amazonaws.com:8080
-ec2-52-56-221-70.eu-west-2.compute.amazonaws.com:9995
+ec2-52-56-205-130.eu-west-2.compute.amazonaws.com:8080
+ec2-52-56-247-251.eu-west-2.compute.amazonaws.com:9995
 
 # install iptables and ntpd
 sudo yum install iptables-services
@@ -107,7 +108,7 @@ https://community.hortonworks.com/questions/44451/zeppelin-service-not-starting-
 
 mkdir -p /var/run/zeppelin-notebook
 chown -R zeppelin:zeppelin /var/run/zeppelin-notebook
-chmod 777 /var/run
+chmod -R 777 /var/run
 
 
 Install Java JDK:

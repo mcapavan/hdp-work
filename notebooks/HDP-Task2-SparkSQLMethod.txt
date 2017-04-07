@@ -8,3 +8,10 @@ df_emp = sqlContext.sql("select t1.emp_no, t1.birth_date, t1.first_name, t1.last
 df_emp.write.format("orc").saveAsTable("employees_new")
 
 sqlContext.sql("select E.emp_no, first_name, last_name, hire_date, S.from_date, S.to_date from employees_new E join (select * from salaries_new where from_date like '1985-05-%' and datediff(to_date, from_date) < 15) S on E.emp_no = S.emp_no").show()
+
+
++------+----------+---------+----------+----------+----------+
+|emp_no|first_name|last_name| hire_date| from_date|   to_date|
++------+----------+---------+----------+----------+----------+
+|296678|   Boutros|  McClurg|1985-05-11|1985-05-11|1985-05-22|
++------+----------+---------+----------+----------+----------+
