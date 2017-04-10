@@ -1,31 +1,24 @@
 #!/usr/bin/env bash
 
-
-
 AWS Details:
-
-ec2-52-56-219-167.eu-west-2.compute.amazonaws.com
- 52.56.219.167
 
 
 chmod 600 hdp-exercise.pem
 
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-219-167.eu-west-2.compute.amazonaws.com
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.com
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com
-
 241 - Master
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-205-130.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-121-83.eu-west-2.compute.amazonaws.com
+
 203 - Zeppelin
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-247-251.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-226-218.eu-west-2.compute.amazonaws.com
+
 130 -
-ssh -i hdp-exercise.pem ec2-user@ec2-52-56-199-154.eu-west-2.compute.amazonaws.com
+ssh -i hdp-exercise.pem ec2-user@ec2-52-56-249-249.eu-west-2.compute.amazonaws.com
 
 
 
 ambari:
-ec2-52-56-205-130.eu-west-2.compute.amazonaws.com:8080
-ec2-52-56-247-251.eu-west-2.compute.amazonaws.com:9995
+ec2-52-56-121-83.eu-west-2.compute.amazonaws.com:8080
+ec2-52-56-226-218.eu-west-2.compute.amazonaws.com:9995
 
 # install iptables and ntpd
 sudo yum install iptables-services
@@ -64,10 +57,6 @@ ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com
 52.56.222.243
 ip-172-31-24-130.eu-west-2.compute.internal
 172.31.24.130
-
-scp -i hdp-exercise.pem hdp-exercise.pem ec2-user@ec2-52-56-220-174.eu-west-2.compute.amazonaws.com:
-scp -i hdp-exercise.pem hdp-exercise.pem ec2-user@ec2-52-56-222-243.eu-west-2.compute.amazonaws.com:
-
 
 sudo -i
 wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.4.2.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
@@ -164,3 +153,13 @@ dfs.permissions.enabled  --> set to false
   <name>dfs.permissions</name>
   <value>false</value>
 </property>
+
+# References:
+https://community.hortonworks.com/questions/26966/sqoop-cdc-jobs-with-weekly-full-refreshes.html
+https://www.ibm.com/developerworks/library/bd-sqltohadoop2/
+https://www.cloudera.com/documentation/enterprise/5-3-x/topics/admin_hbase_import.html
+http://www.drdobbs.com/database/applying-the-big-data-lambda-architectur/240162604
+https://mapr.com/developercentral/lambda-architecture/
+
+beeline
+!connect jdbc:hive2://localhost:10000 hive hadoop

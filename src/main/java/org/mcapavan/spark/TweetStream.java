@@ -53,7 +53,7 @@ public class TweetStream {
         System.setProperty("twitter4j.oauth.accessToken", accessToken);
         System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret);
 
-        String[] filters = new String[] {"hortonworks","bigdata", "IoT", "brexit", "beauty and the beast", "logan"};
+        String[] filters = new String[] {"dataworks","bigdata", "IoT", "brexit", "beauty and the beast", "logan"};
 
 
         JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(jssc, filters);
